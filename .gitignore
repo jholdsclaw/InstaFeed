@@ -21,3 +21,6 @@
 
 # Ignore project file
 .project
+
+# Ignore precompiled assets
+/public/assets
