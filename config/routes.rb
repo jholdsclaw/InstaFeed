@@ -57,7 +57,7 @@ Rails.application.routes.draw do
   root 'feed#index'
   
   # Instagram OAuth routes
-  get 'oauth/connect' => 'oauth#connect'
+  get 'oauth/connect' => 'oauth#connect', as: 'oauth'
   get 'oauth/callback' => 'oauth#callback'
 
   # Live feed route

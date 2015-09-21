@@ -1,6 +1,8 @@
 class FeedController < ApplicationController
   def index
-    
+    if session[:access_token].nil?
+      redirect_to oauth_path
+    end
   end
 
   def search
@@ -16,6 +18,9 @@ class FeedController < ApplicationController
   def view
     # Get the list of recent urls
     @hashtag = params[:hashtag]
+
+    @client = Instagram.client(:access_token => session[:access_token])
+    @tags = @client.tag_search(@hashtag)
   end
   
 end
