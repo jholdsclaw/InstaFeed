@@ -1,8 +1,11 @@
+<div class="container"><br /></div>
 <div class="container">
-<%= form_tag feed_search_path do %>
-  <p>
-    <%= text_field_tag :search, params[:search] %>
-    <%= submit_tag "Search", :name => nil %>
-  </p>
-<% end %>
+  <%= form_tag feed_search_path, :class =>"form-inline" do %>
+    <div class="container-fluid text-center">
+      <div class="form-group">
+          <%= text_field_tag :search, params[:search], :class => "form-control", :placeholder => "Enter hashtag..." %>
+      </div>
+      <%= submit_tag "Search", :name => nil, :class => "btn btn-default" %>
+    </div>
+  <% end %>
 </div>

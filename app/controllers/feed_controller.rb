@@ -8,7 +8,7 @@ class FeedController < ApplicationController
     if !@tag.empty?
       redirect_to feed_path(@tag)
     else
-      redirect_to root_path, :action => 'WTF?'
+      redirect_to root_path
     end
     
   end
