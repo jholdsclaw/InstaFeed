@@ -1,11 +1,4 @@
 class FeedController < ApplicationController
-  def index
-    # this is if we want to do oauth
-    # if session[:access_token].nil?
-      # redirect_to oauth_path
-    # end
-  end
-
   def search
     @tag = params[:search]
     if !@tag.empty?

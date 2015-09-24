@@ -1,10 +1,5 @@
-<div class="container">
-  <p>
-    <%= @hashtag %>
-  </p>
-    
+<div id="slideshow">
   <% for media_item in @media %>
-  <img src='<%= media_item.images.thumbnail.url %>'>
+  <div id="<%= media_item.id %>" class="image" style="background-image:url('<%= media_item.images.standard_resolution.url %>')"></div>
   <% end %>
-    
 </div>
