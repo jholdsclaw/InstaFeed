@@ -4,13 +4,23 @@
 
 @import "bootstrap";
 
+body {
+  background-color: black;
+}
+
+#slideshow {
+  position: absolute;
+  background-color: black;
+  height: 100%;
+  width: 100%;
+}
+
 .image {
-    position: absolute;
-    overflow: hidden;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-    top: 0; left: 0; bottom: 0; right: 0;
-    background-color: black;
-    display: none;
+  overflow: hidden;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background-color: black;
+  display: none;
 }

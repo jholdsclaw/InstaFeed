@@ -28,10 +28,10 @@ startSlideShow = ->
         width: "100%"
 
     current
-      .fadeOut(300)
+      .fadeOut(400)
     next
-      .fadeIn(300)
-    setTimeout nextMedia, 8000
+      .fadeIn(400)
+    setTimeout nextMedia, 6000
     return
 
   nextMedia()
