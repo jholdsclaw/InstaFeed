@@ -1,6 +1,10 @@
 <div class="container">
-  <p><%= @hashtag %></p>
-  <% for media_item in @client.tag_recent_media(@tags[0].name) %>
+  <p>
+    <%= @hashtag %>
+  </p>
+    
+  <% for media_item in @media %>
   <img src='<%= media_item.images.thumbnail.url %>'>
   <% end %>
+    
 </div>

@@ -54,7 +54,7 @@ Rails.application.routes.draw do
   #     resources :products
   #   end
   
-  root 'feed#index'
+  root 'home#index'
   
   # Instagram OAuth routes
   get 'oauth/connect' => 'oauth#connect', as: 'oauth'
