@@ -11,12 +11,25 @@ startSlideShow = ->
   # Get our image divs
   divs = $(".image")
   
-  current = 0
+  idx = 0
 
   nextMedia = ->
-    $(divs[current])
+    current = $(divs[idx])
+    next = $(divs[idx = ++idx % divs.length])
+    
+    aspectRatio = next.width() / next.height()
+    
+    # set height/width to fullscreen based on if it's landscape or portrait
+    if aspectRatio > 1
+      next.css
+        height: "100%"
+    else
+      next.css
+        width: "100%"
+
+    current
       .fadeOut(300)
-    $(divs[current = ++current % divs.length])
+    next
       .fadeIn(300)
     setTimeout nextMedia, 8000
     return
