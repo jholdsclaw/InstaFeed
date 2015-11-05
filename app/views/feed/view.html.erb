@@ -1,9 +1,15 @@
+<% if @no_media %>
+  <%= render "no_media" %>
+<% else %>
 <div id="slideshow">
-<% testing = true %>
-<% unless testing %>
+  <% testing = true %>
+  <% unless testing %>
   <% for media_item in @media %>
   <div id="<%= media_item.id %>" class="image" style="background-image:url('<%= media_item.images.standard_resolution.url %>')"></div>
   <% end %>
-<% end %>
-  <p><%= @media.count %></p>
+  <% end %>
+  <p>
+    <%= @media.count %>
+  </p>
 </div>
+<% end %>
