@@ -11,6 +11,7 @@ class FeedController < ApplicationController
 
   def view
     @hashtag = params[:hashtag]
+
     # This is if we wanted to do an oauth lookup
     # @client = Instagram.client(:access_token => session[:access_token])
     # @tags = @client.tag_search(@hashtag)
@@ -18,15 +19,16 @@ class FeedController < ApplicationController
     # Perform a search for this hash_tag
     @tags = Instagram.tag_search(@hashtag)
     
-    logger.debug(@tags.inspect)
-    
     # Get recent media using the first tag search results (first result will be exact or closest match if no exact)
-    media = Instagram.tag_recent_media(@tags[0].name)
+    response = Instagram.tag_recent_media(@tags[0].name) 
+    @media = [].concat(response)
     
-    @first_id = media.first.id
-    @last_id = media.last.id
-    
-    @media_urls = media.collect { |m| m.images.standard_resolution.url }
+    max_tag_id = response.pagination.next_max_tag_id
+    until max_tag_id.to_s.empty? do
+      response = Instagram.tag_recent_media(@tags[0].name, :max_tag_id => max_tag_id)
+      max_tag_id = response.pagination.next_max_tag_id
+      @media.concat(response)
+    end
   end
   
 end

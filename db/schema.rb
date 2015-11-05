@@ -11,20 +11,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150826044345) do
+ActiveRecord::Schema.define(version: 20151015230932) do
 
   create_table "hashtags", force: :cascade do |t|
     t.string   "hashtag"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+    t.integer  "min_tag_id", limit: 8
+    t.integer  "max_tag_id", limit: 8
   end
 
   create_table "media", force: :cascade do |t|
     t.string   "url_thumbnail"
     t.string   "url_fullsize"
     t.string   "caption"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+    t.integer  "media_id",      limit: 8
   end
 
   create_table "tags", force: :cascade do |t|
