@@ -21,9 +21,9 @@ class FeedController < ApplicationController
     
     # check if we have any existing tags
     existing_hashtag = Hashtag.find_by hashtag: tag
-    existing_media = existing_hashtag.media unless existing_hashtag.nil?
+    existing_media = existing_hashtag.media unless existing_hashtag.blank?
     
-    unless existing_media.nil? 
+    unless existing_media.blank? 
       # already have some media, so let's just fire off the background process...
       # HashtagSearcher.perform_async(tag)
       
@@ -52,11 +52,11 @@ class FeedController < ApplicationController
         end       
         
         response.each do |m|
-          medium = Medium.new do |n_m|
-            n_m.media_id      = m.media_id
-            n_m.caption       = m.caption
-            n_m.url_thumbnail = m.url_thumbnail
-            n_m.url_fullsize  = m.url_fullsize 
+          medium = hashtag.media.create do |n_m|
+            n_m.media_id      = m.id
+            n_m.caption       = m.caption.text
+            n_m.url_thumbnail = m.images.low_resolution.url
+            n_m.url_fullsize  = m.images.standard_resolution.url
           end
           # store the first result
           @first_media ||= medium
@@ -73,12 +73,11 @@ class FeedController < ApplicationController
             @media.concat(response)
           end
 =end
-        end
-      
-      @hashtag       = tag
-      @starting_url = @first_media.url_fullsize unless @first_media.nil? 
+      end
     end
-    
+
+    @hashtag      = tag
+    @starting_url = @first_media.url_fullsize unless @first_media.blank? 
     
     # 2.a only trigger background if there are more than 20 recent exist
   end
