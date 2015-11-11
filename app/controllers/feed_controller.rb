@@ -31,11 +31,8 @@ class FeedController < ApplicationController
     hashtag = Hashtag.find_by hashtag: tag
     media = hashtag.media.first unless hashtag.blank?
     
-    if media.present? 
-      # already have some media, so let's just fire off the background process...
-      # HashtagSearcher.perform_async(tag)
-      
-    else # if no existing media, let's try to fetch media from Instangram
+    # if no existing media, let's try to fetch media from Instangram
+    if media.blank? 
 
       # Perform a search for this hash_tag
       tags = Instagram.tag_search(tag)
@@ -67,21 +64,19 @@ class FeedController < ApplicationController
         end
         
 =begin
-          # check for older photos - check against max_tag_id
-          # check for newer photos - check against min_tag_id
-          
-          max_tag_id = response.pagination.next_max_tag_id
-          until max_tag_id.to_s.empty? do
-            response = Instagram.tag_recent_media(@tags[0].name, :max_tag_id => max_tag_id)
-            max_tag_id = response.pagination.next_max_tag_id
-            @media.concat(response)
-          end
+        # 2.a only trigger background if there are more than 20 recent exist
 =end
       end
     end
 
-    @starting_url = hashtag.media.first.url_fullsize unless @no_media 
-    
-    # 2.a only trigger background if there are more than 20 recent exist
+    # Unless we have no media, let's fire off the background process and get the view going with the starting url
+    unless @no_media
+      # Fire off our background process to get all the rest of the pictures
+      HashtagSearcherJob.perform_later(hashtag) 
+  
+      # Get our starting picture url for the view
+      @starting_url = hashtag.media.first.url_fullsize 
+    end
+
   end
 end
