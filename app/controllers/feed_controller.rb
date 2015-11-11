@@ -27,6 +27,14 @@ class FeedController < ApplicationController
     # Let's be optimistic...
     @no_media = false
     
+    ######################################
+    # All of this is crap for my wedding #
+    ######################################
+    if tag == "jhinstafeed1"
+      # start with first picture in server pics
+      @starting_url = JhMedium.first.url_fullsize
+    end
+    
     # check if we have any existing tags
     hashtag = Hashtag.find_by hashtag: tag
     media = hashtag.media.first unless hashtag.blank?
@@ -72,7 +80,8 @@ class FeedController < ApplicationController
     # Unless we have no media, let's fire off the background process and get the view going with the starting url
     unless @no_media
       # Fire off our background process to get all the rest of the pictures
-      HashtagSearcherJob.perform_later(hashtag) 
+      # TODO: need to make background processing work
+      # HashtagSearcherJob.perform_later(hashtag) 
   
       # Get our starting picture url for the view
       @starting_url = hashtag.media.first.url_fullsize 

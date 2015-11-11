@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151110213518) do
+ActiveRecord::Schema.define(version: 20151111212429) do
 
   create_table "hashtags", force: :cascade do |t|
     t.string   "hashtag"
@@ -19,6 +19,12 @@ ActiveRecord::Schema.define(version: 20151110213518) do
     t.datetime "updated_at",           null: false
     t.string   "min_tag_id", limit: 8
     t.string   "max_tag_id", limit: 8
+  end
+
+  create_table "jh_media", force: :cascade do |t|
+    t.string   "url_fullsize"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
   end
 
   create_table "media", force: :cascade do |t|
