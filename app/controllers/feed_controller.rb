@@ -14,23 +14,28 @@ class FeedController < ApplicationController
   end
 
 
+  # For the view, we want to start by checking if any images exist in our database,
+  # and if so, we'll grab the first one and display it immediately while firing
+  # off the background process to grab any new images from Instagram. If no existing
+  # media is found, we go ahead and grab the first (up to) 20 images from Instagram
+  # and store those, then display the first one while firing off the background process
+  # to pull remaining images.
   def view
+    # We're going to only store downcase
     tag = params[:hashtag].downcase
     
-    # When going to view, start with first image url to so user isn't waiting for AJAX call for first image
+    # Let's be optimistic...
+    @no_media = false
     
     # check if we have any existing tags
-    existing_hashtag = Hashtag.find_by hashtag: tag
-    existing_media = existing_hashtag.media unless existing_hashtag.blank?
+    hashtag = Hashtag.find_by hashtag: tag
+    media = hashtag.media.first unless hashtag.blank?
     
-    unless existing_media.blank? 
+    if media.present? 
       # already have some media, so let's just fire off the background process...
       # HashtagSearcher.perform_async(tag)
       
-      # And set our first media to start with
-      @first_media = existing_media.first
-      @no_medial = false
-    else # if no existing tags, let's try to fetch media from Instangram
+    else # if no existing media, let's try to fetch media from Instangram
 
       # Perform a search for this hash_tag
       tags = Instagram.tag_search(tag)
@@ -51,6 +56,7 @@ class FeedController < ApplicationController
           ht.max_tag_id = response.pagination.max_tag_id
         end       
         
+        # Now lets create all of the images returned
         response.each do |m|
           medium = hashtag.media.create do |n_m|
             n_m.media_id      = m.id
@@ -58,8 +64,6 @@ class FeedController < ApplicationController
             n_m.url_thumbnail = m.images.low_resolution.url
             n_m.url_fullsize  = m.images.standard_resolution.url
           end
-          # store the first result
-          @first_media ||= medium
         end
         
 =begin
@@ -76,8 +80,7 @@ class FeedController < ApplicationController
       end
     end
 
-    @hashtag      = tag
-    @starting_url = @first_media.url_fullsize unless @first_media.blank? 
+    @starting_url = hashtag.media.first.url_fullsize unless @no_media 
     
     # 2.a only trigger background if there are more than 20 recent exist
   end
