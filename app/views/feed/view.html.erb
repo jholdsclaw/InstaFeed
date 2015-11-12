@@ -4,9 +4,8 @@
 	<% testing = true %>
 	<% unless testing %>
 		<div id="slideshow">
-			<% for media_item in @media %>
-			<div id="<%= media_item.id %>" class="image" style="background-image:url('<%= media_item.images.standard_resolution.url %>')"></div>
-			<% end %>
+			<div id="<%= @media_id %>" class="image first" style="background-image:url('<%= @starting_url %>')" data-mtype="<%= @media_type %>" data-hashtagh="<%= @hashtag %>"></div>
+			<div id="buffer" class="image second"></div>
 		</div>
 	<% else %>
 		<p>
