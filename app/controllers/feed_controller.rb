@@ -138,18 +138,53 @@ class FeedController < ApplicationController
               end # response.each do
               ht.max_tag_id = response.pagination.next_max_tag_id
               max_tag_id = response.pagination.next_max_tag_id
-            end
-            
-            
-          end # Hashtag.create do   
-        end
-      end
+            end # until max_tag_id.to_s.empty?
+          end # Hashtag.create do
+        else
+          # get any new media (after ht.min_tag_id)
+          current_min_tag_id = hashtag.min_tag_id
+          response = Instagram.tag_recent_media(hashtag.hashtag, :min_tag_id => hashtag.min_tag_id)
+          until (response.pagination.min_tag_id == current_min_tag_id) do
+            response.each do |m|
+              medium = hashtag.media.create do |n_m|
+                n_m.media_id      = m.id
+                n_m.caption       = m.caption.text
+                n_m.url_thumbnail = m.images.low_resolution.url
+                n_m.url_fullsize  = m.images.standard_resolution.url
+              end # hashtag.media.create do
+            end # response.each do
+            hashtag.min_tag_id = response.pagination.min_tag_id
+            response = Instagram.tag_recent_media(hashtag.hashtag, :min_tag_id => hashtag.min_tag_id)
+          end # until max_tag_id.to_s.empty?
+        end # if hashtag.blank?
+
+        @media_type = "ig"
+        @hashtag = tag
+        @media_id = Medium.first.id
+        @starting_url = Medium.first.url_fullsize
+      else
+        @media_type = "jh"
+        @hashtag = tag
+        @media_id = @next_media.id
+        @starting_url = @next_media.url_fullsize
+      end # if @next_media.nil?
+      
     else
       # get the next media      
       @next_media = Hashtag.find_by(hashtag: hashtag).media.find_by(media_id: media_id).next
       
       # if the next_media is nil, that means we're at end and need to switch to the server media
-      @next_media = JhMedium.first if @next_media.nil?
+      if @next_media.nil?
+        @media_type = "jh"
+        @hashtag = tag
+        @media_id = JhMedium.first.id
+        @starting_url = JhMedium.first.url_fullsize
+      else
+        @media_type = "ig"
+        @hashtag = tag
+        @media_id = @next_media.id
+        @starting_url = @next_media.url_fullsize
+      end
     end
     
     

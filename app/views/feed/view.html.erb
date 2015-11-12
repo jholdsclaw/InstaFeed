@@ -1,10 +1,10 @@
 <% if @no_media %>
 	<%= render "no_media" %>
 <% else %>
-	<% testing = true %>
+	<% testing = false %>
 	<% unless testing %>
 		<div id="slideshow">
-			<div id="<%= @media_id %>" class="image first" style="background-image:url('<%= @starting_url %>')" data-mtype="<%= @media_type %>" data-hashtagh="<%= @hashtag %>"></div>
+			<div id="<%= @media_id %>" class="image first" style="background-image:url('<%= @starting_url %>')" data-mtype="<%= @media_type %>" data-hashtag="<%= @hashtag %>"></div>
 			<div id="buffer" class="image second"></div>
 		</div>
 	<% else %>

@@ -47,11 +47,14 @@ startSlideShow = ->
       error: (response, status, error) ->
         # do some errorchecking?
         console.log(error)
+        return
       success: (data, status, response) ->
+        console.log(data)
         next.attr("id", data.media_id)
-        next.data("mtype", data.type) 
+        next.data("mtype", data.media_type) 
+        next.data("hashtag", data.hashtag) 
         next.css("background-image", "url(" + data.url + ")")
-    
+        return
     aspectRatio = next.width() / next.height()
     
     # set height/width to fullscreen based on if it's landscape or portrait

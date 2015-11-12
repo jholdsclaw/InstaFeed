@@ -65,6 +65,6 @@ Rails.application.routes.draw do
   get 'feed/:hashtag' => 'feed#view', as: 'feed'
   
   # AJAX media fetching
-  post 'media/next' => 'feed#fetch'
+  post 'feed/media/next' => 'feed#fetch'
   
 end
