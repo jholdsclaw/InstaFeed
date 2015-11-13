@@ -6,6 +6,6 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
-for i in 1..92
+for i in 1..4
   JhMedium.create(url_fullsize: "http://jholdsclaw.com/pics/#{i}.jpg")
 end

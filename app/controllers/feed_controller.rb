@@ -103,20 +103,38 @@ class FeedController < ApplicationController
       # if the next_media is nil, that means we're at end and need to switch to the InstaGram media
       if @next_media.nil?
 
+        newtag = false
+        response = Instagram.tag_recent_media(tag)
+
         # check if we have any existing tags
-        hashtag = Hashtag.find_by(hashtag: tag)
-        if hashtag.blank?
-          # need to create new hashtag
-          response = Instagram.tag_recent_media(tag) 
+        hashtag = Hashtag.find_or_create_by(hashtag: tag) do |ht|
+          response = Instagram.tag_recent_media(tag)
+          ht.hashtag = tag
+          ht.min_tag_id = response.pagination.min_tag_id
+          ht.max_tag_id = response.pagination.next_max_tag_id
           
-          hashtag = Hashtag.create do |ht|
-            ht.hashtag    = tag
-            
-            max_tag_id = response.pagination.next_max_tag_id
-            ht.min_tag_id = response.pagination.min_tag_id
-            ht.max_tag_id = response.pagination.next_max_tag_id
-            
-            # Now lets create all of the images returned
+          newtag = true
+        end
+        
+        if newtag
+          # need to fetch all the old pictures
+          max_tag_id = response.pagination.next_max_tag_id
+          hashtag.min_tag_id = response.pagination.min_tag_id
+          hashtag.max_tag_id = response.pagination.next_max_tag_id
+          
+          # Now lets create all of the images returned from first response (max 20)
+          response.each do |m|
+            medium = hashtag.media.create do |n_m|
+              n_m.media_id      = m.id
+              n_m.caption       = m.caption.text
+              n_m.url_thumbnail = m.images.low_resolution.url
+              n_m.url_fullsize  = m.images.standard_resolution.url
+            end # hashtag.media.create do
+          end # response.each do
+          
+          # And now lets grab any older pictures if they exist (means there are more than 20 pictures)
+          until max_tag_id.to_s.blank? do
+            response = Instagram.tag_recent_media(@tags[0].name, :max_tag_id => max_tag_id)
             response.each do |m|
               medium = hashtag.media.create do |n_m|
                 n_m.media_id      = m.id
@@ -125,26 +143,16 @@ class FeedController < ApplicationController
                 n_m.url_fullsize  = m.images.standard_resolution.url
               end # hashtag.media.create do
             end # response.each do
-
-            until max_tag_id.to_s.empty? do
-              response = Instagram.tag_recent_media(@tags[0].name, :max_tag_id => max_tag_id)
-              response.each do |m|
-                medium = hashtag.media.create do |n_m|
-                  n_m.media_id      = m.id
-                  n_m.caption       = m.caption.text
-                  n_m.url_thumbnail = m.images.low_resolution.url
-                  n_m.url_fullsize  = m.images.standard_resolution.url
-                end # hashtag.media.create do
-              end # response.each do
-              ht.max_tag_id = response.pagination.next_max_tag_id
-              max_tag_id = response.pagination.next_max_tag_id
-            end # until max_tag_id.to_s.empty?
-          end # Hashtag.create do
+            hashtag.max_tag_id = response.pagination.next_max_tag_id
+            hashtag.save
+            max_tag_id = response.pagination.next_max_tag_id
+          end # until max_tag_id.to_s.blank?
+          
+        
         else
-          # get any new media (after ht.min_tag_id)
-          current_min_tag_id = hashtag.min_tag_id
+          # get any new media isnce last fetch (after ht.min_tag_id)
           response = Instagram.tag_recent_media(hashtag.hashtag, :min_tag_id => hashtag.min_tag_id)
-          until (response.pagination.min_tag_id == current_min_tag_id) do
+          until response.pagination.min_tag_id.to_s.blank? do
             response.each do |m|
               medium = hashtag.media.create do |n_m|
                 n_m.media_id      = m.id
@@ -154,13 +162,14 @@ class FeedController < ApplicationController
               end # hashtag.media.create do
             end # response.each do
             hashtag.min_tag_id = response.pagination.min_tag_id
+            hashtag.save
             response = Instagram.tag_recent_media(hashtag.hashtag, :min_tag_id => hashtag.min_tag_id)
-          end # until max_tag_id.to_s.empty?
-        end # if hashtag.blank?
+          end # until response.min_tag_id.to_s.blank? do
+        end # if newtag
 
         @media_type = "ig"
         @hashtag = tag
-        @media_id = Medium.first.id
+        @media_id = Medium.first.media_id
         @starting_url = Medium.first.url_fullsize
       else
         @media_type = "jh"
@@ -171,7 +180,7 @@ class FeedController < ApplicationController
       
     else
       # get the next media      
-      @next_media = Hashtag.find_by(hashtag: hashtag).media.find_by(media_id: media_id).next
+      @next_media = Hashtag.find_by(hashtag: tag).media.find_by(media_id: media_id).next
       
       # if the next_media is nil, that means we're at end and need to switch to the server media
       if @next_media.nil?
@@ -182,7 +191,7 @@ class FeedController < ApplicationController
       else
         @media_type = "ig"
         @hashtag = tag
-        @media_id = @next_media.id
+        @media_id = @next_media.media_id
         @starting_url = @next_media.url_fullsize
       end
     end
