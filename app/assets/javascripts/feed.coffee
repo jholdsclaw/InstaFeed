@@ -36,7 +36,7 @@ startSlideShow = ->
     next = $(divs[idx = ++idx % divs.length])
     
     # load next image via AJAX
-    $.ajax
+    response = $.ajax
       type: "POST"
       url: "media/next"
       dataType: "json"
@@ -44,32 +44,40 @@ startSlideShow = ->
         type: current.data("mtype")
         hashtag: current.data("hashtag")
         media_id: current.attr("id")
-      error: (response, status, error) ->
-        # do some errorchecking?
-        console.log(error)
-        return
-      success: (data, status, response) ->
-        console.log(data)
-        next.attr("id", data.media_id)
-        next.data("mtype", data.media_type) 
-        next.data("hashtag", data.hashtag) 
-        next.css("background-image", "url(" + data.url + ")")
-        return
-    aspectRatio = next.width() / next.height()
     
-    # set height/width to fullscreen based on if it's landscape or portrait
-    if aspectRatio > 1
-      next.css
-        height: "100%"
-    else
-      next.css
-        width: "100%"
+    response.done (data) ->
+      next.attr("id", data.media_id)
+      next.data("mtype", data.media_type) 
+      next.data("hashtag", data.hashtag) 
 
-    current
-      .fadeOut(400)
-    next
-      .fadeIn(400)
-    setTimeout nextMedia, 6000
+      # pre load/cache the image
+      newImage = new Image()
+      newImage.src = data.url
+      newImage.onload = () ->
+        next.css("background-image", "url(" + data.url + ")")
+
+        aspectRatio = next.width() / next.height()
+            
+        # set height/width to fullscreen based on if it's landscape or portrait
+        if aspectRatio > 1
+          next.css
+            height: "100%"
+        else
+          next.css
+            width: "100%"
+    
+        current
+          .fadeOut(600)
+        next
+          .fadeIn(600)
+        setTimeout nextMedia, 4000
+        return
+    
+    response.fail (resonse, error) ->
+      # do some errorchecking?
+      console.log(error)
+      return
+    
     return
 
   nextMedia()

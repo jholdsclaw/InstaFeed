@@ -37,8 +37,8 @@ ActiveRecord::Schema.define(version: 20151111212429) do
   end
 
   create_table "tags", force: :cascade do |t|
-    t.integer  "hashtag_id"
-    t.integer  "medium_id"
+    t.string   "hashtag_id"
+    t.string   "medium_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
