@@ -6,6 +6,7 @@
 
 # Ignore bundler config.
 /.bundle
+/vendor/bundle
 
 # Ignore the default SQLite database.
 /db/*.sqlite3
@@ -15,15 +16,26 @@
 /log/*
 !/log/.keep
 /tmp
+capybara-*.html
 *.class
 *.pyc
 *.pyo
+*.rbc
+.rspec
+/spec/tmp
+**.orig
+rerun.txt
 
 # Ignore project file
 .project
 
 # Ignore precompiled assets
 /public/assets
+/public/system
 
-# Ignore the gem lock file
-Gemfile.lock
+# these should all be checked in to normalise the environment:
+# Gemfile.lock, .ruby-version, .ruby-gemset
+
+# unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
+.rvmrc
+
