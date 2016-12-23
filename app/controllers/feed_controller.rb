@@ -27,7 +27,7 @@ class FeedController < ApplicationController
     # Let's be optimistic...
     @no_media = false
     
-    if tag == "jhinstafeed1"
+    if tag == "jusvix4ever"
       ######################################
       # All of this is crap for my wedding #
       ######################################
